@@ -1,3 +1,4 @@
+#pragma once
 #include <memory>
 #include <iostream>
 #include <boost/asio.hpp>
@@ -8,6 +9,7 @@ private:
     boost::asio::ip::udp::socket socket;
     boost::asio::ip::udp::endpoint sender;
     uint16_t port;
+    uint8_t protocoolVersion_;
     static constexpr uint32_t MAGIC = 0xDEADBEEF; //Temporary solution.
     static constexpr std::size_t MaxPacketSize_ = 1024; 
     std::array<char, MaxPacketSize_> buffer;
@@ -17,11 +19,12 @@ private:
 
 
 public:
-    explicit DiscoveryListener(boost::asio::io_context& io)
+    explicit DiscoveryListener(boost::asio::io_context& io, uint8_t protocoolVersion)
     :   socket(io, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0)),
+        protocoolVersion_(protocoolVersion),
         port(socket.local_endpoint().port())
         {
-            std::cout << "[Listener] Listening on "
+            std::cout << "[Discovery] Listening on "
             << socket.local_endpoint().address() << ':'
             << socket.local_endpoint().port() << '\n';
         }
