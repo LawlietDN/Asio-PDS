@@ -1,5 +1,5 @@
-#include <AsioPDS/discoveryListener.h>
 #include <iostream>
+#include <AsioPDS/discoveryListener.h>
 void DiscoveryListener::start()
 {
     startReceive();
@@ -42,5 +42,8 @@ bool DiscoveryListener::isPacketValid(std::array<char, MaxPacketSize_> const& bu
 }
 void DiscoveryListener::processPacket(std::array<char, MaxPacketSize_> const& buffer, std::size_t const& bytesReceived)
 {
-
+    const char* data = buffer.data();
+    std::size_t offset = 4;
+    uint8_t protocoolVersion = data[offset++];
+    if(protocoolVersion != protocoolVersion_) return;
 }
