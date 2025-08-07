@@ -1,28 +1,27 @@
 #pragma once
 #include <memory>
 #include <iostream>
+#include <utility>
 #include <boost/asio.hpp>
+#include "proto.h"
+#include "AsioPDS/discoveryPacket.h"
 
 class DiscoveryListener : public std::enable_shared_from_this<DiscoveryListener>
 {
 private:
     boost::asio::ip::udp::socket socket;
     boost::asio::ip::udp::endpoint sender;
-    uint16_t port;
-    uint8_t protocoolVersion_;
-    static constexpr uint32_t MAGIC = 0xDEADBEEF; //Temporary solution.
-    static constexpr std::size_t MaxPacketSize_ = 1024; 
-    std::array<char, MaxPacketSize_> buffer;
+
+    std::function<void(DiscoveryPacket, boost::asio::ip::udp::endpoint)> onPacketReceived;
+    std::array<char, sizeof(DiscoveryPacket)> buffer;
     void startReceive();
-    void processPacket(std::array<char, MaxPacketSize_> const& buffer, std::size_t const& bytesReceived);
-    bool isPacketValid(std::array<char, MaxPacketSize_> const& buffer,  std::size_t const& bytesReceived);
+    bool processPacket(std::array<char, sizeof(DiscoveryPacket)> const& buffer,  size_t const& bytes);
 
 
 public:
-    explicit DiscoveryListener(boost::asio::io_context& io, uint8_t protocoolVersion)
-    :   socket(io, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0)),
-        protocoolVersion_(protocoolVersion),
-        port(socket.local_endpoint().port())
+    explicit DiscoveryListener(boost::asio::io_context& io, std::function<void(DiscoveryPacket, boost::asio::ip::udp::endpoint)> onPacketReceived_)
+    :   socket(io, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), proto::DiscoveryPort)),
+        onPacketReceived(std::move(onPacketReceived_))
         {
             std::cout << "[Discovery] Listening on "
             << socket.local_endpoint().address() << ':'
