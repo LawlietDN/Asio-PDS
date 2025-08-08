@@ -19,13 +19,6 @@ private:
 
 
 public:
-    explicit DiscoveryListener(boost::asio::io_context& io, std::function<void(DiscoveryPacket, boost::asio::ip::udp::endpoint)> onPacketReceived_)
-    :   socket(io, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), proto::DiscoveryPort)),
-        onPacketReceived(std::move(onPacketReceived_))
-        {
-            std::cout << "[Discovery] Listening on "
-            << socket.local_endpoint().address() << ':'
-            << socket.local_endpoint().port() << '\n';
-        }
+    DiscoveryListener(boost::asio::io_context& io, std::function<void(DiscoveryPacket, boost::asio::ip::udp::endpoint)> onPacketReceived_);
     void start();
 };
